@@ -276,7 +276,7 @@ LIMIT 5;
 ---Checking Overlaps / Performance: You want to see if a task is taking longer to execute than its scheduled interval (e.g., a task scheduled every 5 minutes that takes 7 minutes to run).
 
 
---ignore
+--1) ignore
 --testing Table creation in vscode 
 
 --Step 2: Create Source Table
@@ -288,5 +288,7 @@ CREATE OR REPLACE TABLE demo_Db.PIPELINE.SOURCE_CUSTOMER2
     CITY STRING
 );
 hi
+--- Github update check 1
+---code 100 lines
 
 
