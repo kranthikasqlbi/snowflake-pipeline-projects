@@ -276,7 +276,7 @@ LIMIT 5;
 ---Checking Overlaps / Performance: You want to see if a task is taking longer to execute than its scheduled interval (e.g., a task scheduled every 5 minutes that takes 7 minutes to run).
 
 
---1) ignore
+--1) ignoree
 --testing Table creation in vscode 
 
 --Step 2: Create Source Table
