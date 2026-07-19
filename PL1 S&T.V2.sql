@@ -292,3 +292,35 @@ hi
 ---code 100 lines
 
 
+----------Sync Source table to Target table using Streams + Tasks
+
+-- 2. Create the automation task
+CREATE OR REPLACE TASK sync_customer_data_task
+    WAREHOUSE = my_compute_wh
+    SCHEDULE = '5 MINUTE' -- Runs every 5 minutes
+    WHEN SYSTEM$STREAM_HAS_DATA('source_table_stream') -- Guard rails: runs only if data changed
+AS
+MERGE INTO my_target_table AS target
+USING source_table_stream AS source
+ON target.customer_id = source.customer_id -- Replace with your primary key
+
+-- Case 1: Handle INSERTs and UPDATEs
+WHEN MATCHED AND source.METADATA$ACTION = 'INSERT' AND source.METADATA$ISUPDATE = TRUE THEN
+    UPDATE SET 
+        target.customer_name = source.customer_name,
+        target.email = source.email,
+        target.updated_at = CURRENT_TIMESTAMP()
+
+-- Case 2: Handle brand new INSERTs
+WHEN NOT MATCHED AND source.METADATA$ACTION = 'INSERT' AND source.METADATA$ISUPDATE = FALSE THEN
+    INSERT (customer_id, customer_name, email, created_at, updated_at)
+    VALUES (source.customer_id, source.customer_name, source.email, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())
+
+-- Case 3: Handle HARD DELETEs
+WHEN MATCHED AND source.METADATA$ACTION = 'DELETE' THEN
+    DELETE;
+
+
+-- 3. Activate your task
+ALTER TASK sync_customer_data_task RESUME;    
+---end
